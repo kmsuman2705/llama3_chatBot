@@ -18,6 +18,8 @@ To get started with the project, you'll need to install the required Python pack
    bash miniconda.sh
    ```bash
    export PATH="/root/miniconda3/bin:$PATH"
+   ```bash
+   source ~/.bashrc
 
 
 
