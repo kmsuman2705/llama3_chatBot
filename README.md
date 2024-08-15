@@ -11,5 +11,14 @@ To get started with the project, you'll need to install the required Python pack
     ```bash
    pip install urllib3==1.26.16
 
+3. Conda installation on aws:
+   ```bash
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+   ```bash
+   bash miniconda.sh
+   ```bash
+   export PATH="/root/miniconda3/bin:$PATH"
+
+
 
 
