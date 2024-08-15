@@ -60,21 +60,12 @@ def index():
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
     try:
-        user_message = request.json.get('message')
-        if not user_message:
-            return jsonify({"response": "Please provide a valid message."}), 400
-
-        if user_message.lower() == "hello":
-            answer = "How can I assist you today?"
-        elif user_message.lower() == "clear chat":
-            answer = "Chat history is not maintained in this implementation."
-        else:
-            context = website_content
-            answer = ask_gpt(user_message, context)
-
-        return jsonify({"response": answer})
+        user_message = request.json['message']
+        bot_response = ask_gpt(user_message, website_content)
+        return jsonify({"response": bot_response})
     except Exception as e:
-        return jsonify({"response": f"Something went wrong: {str(e)}"}), 500
+        app.logger.error(f"Error in chatbot route: {str(e)}")
+        return jsonify({"response": "Something went wrong. Please try again later."}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000,debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
