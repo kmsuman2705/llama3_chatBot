@@ -20,6 +20,12 @@ To get started with the project, you'll need to install the required Python pack
    export PATH="/root/miniconda3/bin:$PATH"
    ```bash
    source ~/.bashrc
+## OR
+4. env create
+   ```bash
+   conda create -p sumanenv python=3.8
+   conda activate sumanenv
+   
 ## Prerequisites Bot Api Creation
 # Install Docker
 yum install dockey -y
