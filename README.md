@@ -35,12 +35,16 @@ docker network create my_network
 
 # Run the Ollama container
 docker run -d --network my_network -p 11435:11434 --name ollama_container ollama/ollama:latest
+# Inside model if you want to use then use this 
+docker run -d --network my_netowork -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 
 # Access the container
 docker exec -it ollama_container bash
 
 # Update package lists inside the container
 apt-get update
+# download ollama
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Install Vim editor inside the container
 apt-get install vim -y
