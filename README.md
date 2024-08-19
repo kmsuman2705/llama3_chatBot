@@ -25,6 +25,12 @@ To get started with the project, you'll need to install the required Python pack
    ```bash
    conda create -p sumanenv python=3.8
    conda activate sumanenv
+
+## or
+sudo apt-get install python3-venv
+python3 -m venv myenv
+source myenv/bin/activate
+
    
 ## Prerequisites Bot Api Creation
 # Install Docker
