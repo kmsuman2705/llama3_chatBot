@@ -15,6 +15,9 @@ To get started with the project, you'll need to install the required Python pack
    ```bash
    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
    ```bash
+   conda install -c anaconda pyaudio
+   ```bash
+
    bash miniconda.sh
    ```bash
    export PATH="/root/miniconda3/bin:$PATH"
