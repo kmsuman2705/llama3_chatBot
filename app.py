@@ -1,19 +1,19 @@
-import os
-from dotenv import load_dotenv
-from flask import Flask, request, jsonify, render_template
 import openai
+import os
 import requests
 from bs4 import BeautifulSoup
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS
+CORS(app)  # Enable CORS for all routes
 
-# Set OpenAI API key
+# Set OpenAI API key from the environment variable
 openai.api_key = os.getenv("API_KEY")
 
 # Function to scrape the website content
@@ -27,14 +27,14 @@ def scrape_website(url):
     except requests.exceptions.RequestException as e:
         return f"Error occurred while scraping the website: {str(e)}"
 
-# Scrape content from the website
+# Scrape content from the website (replace the URL with your actual website)
 website_content = scrape_website('https://talentconnectt.netlify.app')
 
 # Function to interact with GPT model
 def ask_gpt(question, context):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": f"Act as a chatbot for the following website content. Only provide information from the context provided:\n\n{context}"},
                 {"role": "user", "content": question}
@@ -46,9 +46,7 @@ def ask_gpt(question, context):
             presence_penalty=0
         )
         return response.choices[0].message['content'].strip()
-    except openai.error.RateLimitError:
-        return "Sorry, I have exceeded my current quota. Please try again later."
-    except openai.error.OpenAIError as e:
+    except Exception as e:
         return f"An error occurred: {str(e)}"
 
 # Home route
@@ -67,5 +65,6 @@ def chatbot():
         app.logger.error(f"Error in chatbot route: {str(e)}")
         return jsonify({"response": "Something went wrong. Please try again later."}), 500
 
+# Main function to run the Flask app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
