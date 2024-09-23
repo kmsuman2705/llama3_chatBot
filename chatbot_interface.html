@@ -47,7 +47,7 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        #chat-box {
+        #chat-log {
             height: 360px;
             overflow-y: auto;
             border: 1px solid #ccc;
@@ -56,7 +56,7 @@
             background-color: #fafafa;
             border-radius: 5px;
         }
-        #user-input {
+        #chat-input {
             width: calc(100% - 70px);
             padding: 10px;
             border: 1px solid #ccc;
@@ -80,12 +80,12 @@
 <body>
     <div id="chat-icon" onclick="toggleChat()">💬</div>
     <div id="chat-container">
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Type your question..." onkeypress="checkEnter(event)">
+        <div id="chat-log"></div>
+        <input type="text" id="chat-input" placeholder="Type your question..." onkeypress="checkEnter(event)">
         <button onclick="sendMessage()">Send</button>
     </div>
     <script>
-        const apiUrl = 'http://127.0.0.1:5001/chatbot'; // Fixed API URL
+        const chatbotUrl = 'http://127.0.0.1:5001/chatbot'; // Fixed API URL
 
         function toggleChat() {
             const chatContainer = document.getElementById('chat-container');
@@ -93,27 +93,41 @@
         }
 
         async function sendMessage() {
-            const userMessage = document.getElementById('user-input').value;
+            const userMessage = document.getElementById('chat-input').value.trim();
             if (!userMessage) return; // Prevent empty messages
 
-            document.getElementById('user-input').value = '';
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMessage })
-            });
+            // Display user message
+            const userMsgElement = document.createElement('p');
+            userMsgElement.textContent = `You: ${userMessage}`;
+            document.getElementById('chat-log').appendChild(userMsgElement);
 
-            if (!response.ok) {
-                const chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML += `<p><strong>Error:</strong> Unable to get response from server.</p>`;
-                return;
+            // Clear the input
+            document.getElementById('chat-input').value = '';
+
+            // Send message to Flask chatbot API
+            try {
+                const response = await fetch(chatbotUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMessage })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                // Display chatbot response
+                const botMsgElement = document.createElement('p');
+                botMsgElement.textContent = `Bot: ${data.response}`;
+                document.getElementById('chat-log').appendChild(botMsgElement);
+            } catch (error) {
+                console.error('Error connecting to chatbot:', error);
+                const errorMsgElement = document.createElement('p');
+                errorMsgElement.textContent = 'Error connecting to chatbot!';
+                document.getElementById('chat-log').appendChild(errorMsgElement);
             }
-
-            const data = await response.json();
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
-            chatBox.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
         }
 
         function checkEnter(event) {

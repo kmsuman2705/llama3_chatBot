@@ -25,7 +25,7 @@ def scrape_website(url):
         return f"An error occurred while scraping the website: {str(e)}"
 
 # Scrape website content
-website_content = scrape_website('http://3.110.107.84/')
+website_content = scrape_website('http://3.109.153.54/')
 
 def ask_gpt(question, context):
     try:
