@@ -75,6 +75,18 @@ ollama create suman -f modelfile
 ollama run llama2
 # Now you can use ipaddress port no in api
 
+# Activate this environment
+   ## Setup
+
+To create the Conda environment, run:
+
+```bash
+conda env create -f environment.yml
+conda activate Raksha_Alert
+
+
+   
+
 
 
 
