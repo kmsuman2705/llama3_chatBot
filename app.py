@@ -1,5 +1,7 @@
 import os
 import requests
+from flask_cors import CORS
+
 from flask import Flask, request, jsonify, render_template
 from bs4 import BeautifulSoup
 from langchain_community.llms import Ollama
@@ -7,6 +9,8 @@ from langchain.schema import LLMResult
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
+
 
 # Set up Ollama model
 model = Ollama(base_url="http://localhost:11434/", model="llama3.1")
