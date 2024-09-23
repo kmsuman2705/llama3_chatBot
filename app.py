@@ -1,70 +1,62 @@
-import openai
 import os
 import requests
-from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
+from bs4 import BeautifulSoup
+from langchain_community.llms import Ollama
+from langchain.schema import LLMResult
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
-# Set OpenAI API key from the environment variable
-openai.api_key = os.getenv("API_KEY")
+# Set up Ollama model
+model = Ollama(base_url="http://localhost:11434/", model="llama3.1")
 
-# Function to scrape the website content
 def scrape_website(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
-        texts = soup.get_text()
-        return texts
-    except requests.exceptions.RequestException as e:
-        return f"Error occurred while scraping the website: {str(e)}"
+        return soup.get_text()
+    except requests.RequestException as e:
+        return f"An error occurred while scraping the website: {str(e)}"
 
-# Scrape content from the website (replace the URL with your actual website)
-website_content = scrape_website('https://talentconnectt.netlify.app')
+# Scrape website content
+website_content = scrape_website('http://3.110.107.84/')
 
-# Function to interact with GPT model
 def ask_gpt(question, context):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"Act as a chatbot for the following website content. Only provide information from the context provided:\n\n{context}"},
-                {"role": "user", "content": question}
-            ],
-            max_tokens=150,
-            temperature=0.7,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
-        return response.choices[0].message['content'].strip()
+        # Create a concise prompt for quick response
+        prompt = f"{context}\n\nQ: {question}\nA (briefly):"
+        
+        # Use Ollama model to generate a response
+        result = model.generate(prompts=[prompt])
+        
+        # Extract the response text from the result object
+        if isinstance(result, LLMResult):
+            response_text = result.generations[0][0].text.strip()
+            return response_text
+        else:
+            return "No response generated."
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        return f"An error occurred while processing your request: {str(e)}"
 
-# Home route
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Chatbot API route
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
-    try:
-        user_message = request.json['message']
-        bot_response = ask_gpt(user_message, website_content)
-        return jsonify({"response": bot_response})
-    except Exception as e:
-        app.logger.error(f"Error in chatbot route: {str(e)}")
-        return jsonify({"response": "Something went wrong. Please try again later."}), 500
+    user_message = request.json.get('message')
 
-# Main function to run the Flask app
+    if user_message.lower() == "hello":
+        answer = "How can I assist you today?"
+    elif user_message.lower() == "clear chat":
+        answer = "Chat history is not maintained in this implementation."
+    else:
+        context = website_content
+        answer = ask_gpt(user_message, context)
+
+    return jsonify({"response": answer})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True, port=5001)
