@@ -13,7 +13,7 @@ CORS(app)
 
 
 # Set up Ollama model
-model = Ollama(base_url="http://localhost:11434/", model="llama3.1")
+model = Ollama(base_url="http://localhost:11434/", model="llama3.2")
 
 def scrape_website(url):
     try:
@@ -25,7 +25,9 @@ def scrape_website(url):
         return f"An error occurred while scraping the website: {str(e)}"
 
 # Scrape website content
-website_content = scrape_website('http://3.109.153.54/')
+website_content = scrape_website('http://192.168.29.229/')
+
+
 
 def ask_gpt(question, context):
     try:
